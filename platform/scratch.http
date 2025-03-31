@@ -1,0 +1,42 @@
+### Base URL variables
+@baseUrl = http://localhost:3001
+@api = /api/v1
+### Get welcome message
+GET {{baseUrl}}
+
+### Create a new shortened URL
+POST {{baseUrl}}{{api}}/urls
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.example.com/1/2/3/4/5",
+  "customSlug": "example"
+}
+
+### Create a new shortened URL (random slug)
+POST {{baseUrl}}/api/urls
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.example.com/another/very/long/url"
+}
+
+### Get all URLs
+GET {{baseUrl}}/api/urls
+
+### Get URL by slug
+GET {{baseUrl}}/api/urls/example
+
+### Update URL slug
+PUT {{baseUrl}}/api/urls/YOUR_URL_ID_HERE
+Content-Type: application/json
+
+{
+  "slug": "new-example"
+}
+
+### Delete URL
+DELETE {{baseUrl}}/api/urls/YOUR_URL_ID_HERE
+
+### Redirect test - visit this in a browser
+# {{baseUrl}}/example
