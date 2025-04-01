@@ -17,7 +17,7 @@ import { Url } from './shortener/entities/url.entity/url.entity';
     }),
     ThrottlerModule.forRoot([{
       name: 'short',
-      limit: 10,
+      limit: 20, // Might be low... but...
       ttl: 60000 // (60 seconds)
     }]),
     ShortenerModule,
