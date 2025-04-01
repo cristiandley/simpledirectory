@@ -6,13 +6,12 @@ import clsx from "clsx";
 import { fontMono } from "@/config/fonts";
 
 export const metadata: Metadata = {
-    title: 'URL Shortener',
-    description: 'A URL shortener application with tracking and management features',
+    title: 'KittyDirectory',
+    description: 'Shorten your URL',
 };
 
-export default function RootLayout({
-                                       children,
-                                   }: {
+export default function RootLayout({ children,
+}: {
     children: React.ReactNode;
 }) {
     return (
@@ -25,7 +24,7 @@ export default function RootLayout({
         >
                 <Providers themeProps={{ attribute: "class", defaultTheme: "dark"}}>
                     <div className="min-h-screen text-foreground font-sans">
-                        <div className="max-w-6xl mx-auto p-8 max-w-[800px]">
+                        <div className="mx-auto p-8 max-w-[800px]">
                             {children}
                         </div>
                     </div>

@@ -16,7 +16,7 @@ export default function HeroKitty() {
                             alt="Kitty with long legs"
                             className="object-contain rounded-xl bg-[#1a1a1a] p-2"
                         />
-                        <span className="text-sm font-medium mt-1">dark_kitty.com/m/e/o/o/w</span>
+                        <span className="text-sm font-medium mt-1">bigkitty.com/m/e/o/o/w</span>
                     </div>
 
                     <Icon

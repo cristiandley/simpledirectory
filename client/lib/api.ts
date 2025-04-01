@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Url, CreateUrlDto, UpdateUrlDto } from '@/types/url';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -11,8 +11,9 @@ const api = axios.create({
 });
 
 export const urlService = {
-    createUrl: async (data: CreateUrlDto): Promise<{ url: Url; shortenedUrl: string }> => {
-        const response = await api.post('/urls', data);
+    createUrl: async (data: CreateUrlDto, userId?: string): Promise<{ url: Url; shortenedUrl: string }> => {
+        const requestData = userId ? { ...data, userId } : data;
+        const response = await api.post('/urls', requestData);
         return response.data;
     },
     getUrls: async (userId?: string): Promise<Url[]> => {

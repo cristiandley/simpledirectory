@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Button, addToast } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { urlService } from '@/lib/api';
@@ -13,8 +13,24 @@ interface UrlFormProps {
 export default function UrlForm({ onSuccess }: UrlFormProps) {
     const [url, setUrl] = useState('');
     const [customSlug, setCustomSlug] = useState('');
+    const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showResult, setShowResult] = useState(false);
+    const [shortenedUrl, setShortenedUrl] = useState('');
+
+    // Load saved email from localStorage on component mount
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedEmail) {
+            setEmail(savedEmail);
+        }
+    }, []);
+
+    // TODO: use ZOD validator or something like that
+    const validateEmail = (email: string) => {
+        return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+    };
 
     const handleSubmit = async () => {
         if (!url) {
@@ -22,21 +38,49 @@ export default function UrlForm({ onSuccess }: UrlFormProps) {
             return;
         }
 
+        // Validate email if provided
+        if (email && !validateEmail(email)) {
+            addToast({
+                title: 'Invalid email format',
+                description: 'Please enter a valid email address',
+                color: 'warning',
+                icon: <Icon icon="lucide:alert-triangle" />
+            });
+            return;
+        }
+
         try {
             setIsLoading(true);
             setError('');
+            setShowResult(false);
+
+            // Save email to localStorage if provided
+            if (email) {
+                localStorage.setItem('userEmail', email);
+            }
+
+            // Create request data
             const data: CreateUrlDto = {
                 originalUrl: url,
                 ...(customSlug && { customSlug }),
             };
-            const result = await urlService.createUrl(data);
+
+            // Create URL (with email as userId if provided)
+            const result = await urlService.createUrl(data, email || undefined);
+
+            // Show success message
             addToast({
-                title: 'URL shortened successfully! 🎉',
-                description: result.shortenedUrl,
+                title: 'URL shortened successfully!',
+                description: 'Your shortened URL is ready to use',
                 color: 'success',
-                icon: <Icon icon="lucide:check" />,
+                icon: <Icon icon="lucide:check" />
             });
 
+            // Set the shortened URL for display
+            setShortenedUrl(result.shortenedUrl);
+            setShowResult(true);
+
+            // Reset form inputs except email
             setUrl('');
             setCustomSlug('');
             onSuccess();
@@ -55,36 +99,93 @@ export default function UrlForm({ onSuccess }: UrlFormProps) {
         }
     };
 
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(shortenedUrl);
+            addToast({
+                title: 'Copied to clipboard!',
+                color: 'primary',
+                icon: <Icon icon="lucide:copy" />
+            });
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            addToast({
+                title: 'Failed to copy',
+                color: 'danger',
+                icon: <Icon icon="lucide:x" />
+            });
+        }
+    };
+
     return (
-        <div className="max-w-lg mx-auto space-y-4">
+        <div className="w-full max-w-2xl mx-auto">
             <div className="flex flex-col gap-4">
                 <Input
-                    label="Enter URL"
-                    placeholder="https://kitty.com"
+                    label="Your URL"
+                    placeholder="https://example.com/long/path/to/resource"
                     value={url}
                     onValueChange={setUrl}
                     variant="bordered"
-                    startContent={<Icon icon="lucide:link" className="text-default-400" />}
+                    className="border-gray-700 focus:border-gray-500"
+                    startContent={<Icon icon="lucide:link" className="text-gray-500" />}
                     isInvalid={!!error}
                     errorMessage={error}
                 />
-                <Input
-                    label="Custom Slug (Optional)"
-                    placeholder="custom-name"
-                    value={customSlug}
-                    onValueChange={setCustomSlug}
-                    variant="bordered"
-                    startContent={<Icon icon="lucide:tag" className="text-default-400" />}
-                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                        label="Custom shortcode (optional)"
+                        placeholder="my-custom-url"
+                        value={customSlug}
+                        onValueChange={setCustomSlug}
+                        variant="bordered"
+                        className="border-gray-700 focus:border-gray-500"
+                        startContent={<Icon icon="lucide:tag" className="text-gray-500" />}
+                        description="Leave empty for random code"
+                    />
+
+                    <Input
+                        label="Your email (optional)"
+                        placeholder="you@example.com"
+                        value={email}
+                        onValueChange={setEmail}
+                        variant="bordered"
+                        className="border-gray-700 focus:border-gray-500"
+                        startContent={<Icon icon="lucide:mail" className="text-gray-500" />}
+                        description="Associate URLs with your email"
+                    />
+                </div>
+
                 <Button
                     color="primary"
                     onPress={handleSubmit}
                     isLoading={isLoading}
-                    className="w-full"
+                    className="w-full font-semibold text-lg py-6"
+                    startContent={!isLoading && <Icon icon="lucide:scissors" className="text-xl" />}
                 >
-                    Shorten URL
+                    {isLoading ? "Shortening..." : "Shorten URL"}
                 </Button>
             </div>
+
+            {showResult && (
+                <div className="mt-6 p-4 bg-[#1a1a1a] rounded-lg text-white">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <div>
+                            <p className="text-sm text-gray-400 mb-1">Your shortened URL:</p>
+                            <p className="text-lg font-medium word-break-all">{shortenedUrl}</p>
+                        </div>
+                        <Button
+                            color="primary"
+                            variant="flat"
+                            onPress={copyToClipboard}
+                            className="shrink-0"
+                            startContent={<Icon icon="lucide:copy" />}
+                        >
+                            Copy
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
