@@ -19,7 +19,7 @@ import { Visit } from './shortener/entities/visit.entity/visit.entity';
     ThrottlerModule.forRoot([
       {
         name: 'short',
-        limit: 20, // Might be low... but...
+        limit: 100, // Might be low... but...
         ttl: 60000, // (60 seconds)
       },
     ]),

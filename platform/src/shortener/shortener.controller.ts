@@ -10,19 +10,21 @@ import {
   NotFoundException,
   HttpStatus,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateUrlDto, UpdateUrlDto } from './dto/url.dto/url.dto';
 import { Url } from './entities/url.entity/url.entity';
-import { Visit } from "./entities/visit.entity/visit.entity";
+import { Visit } from './entities/visit.entity/visit.entity';
 
 @Controller()
 export class ShortenerController {
+  private readonly logger = new Logger(ShortenerController.name);
   constructor(private readonly shortenerService: ShortenerService) {}
 
   @Post('urls')
   async create(
-      @Body() createUrlDto: CreateUrlDto,
+    @Body() createUrlDto: CreateUrlDto,
   ): Promise<{ url: Url; shortenedUrl: string }> {
     const { userId, ...urlData } = createUrlDto;
     const url = await this.shortenerService.create(urlData, userId);
@@ -54,28 +56,32 @@ export class ShortenerController {
 
   @Get('urls/:slug')
   async findBySlug(@Param('slug') slug: string): Promise<Url> {
+    this.logger.log('Finding and Tracking...');
+    await this.shortenerService.trackVisit(slug);
     return this.shortenerService.findBySlug(slug);
   }
 
   @Put('urls/:id')
   async update(
-      @Param('id') id: string,
-      @Body() updateUrlDto: UpdateUrlDto,
-      @Query('userId') userId?: string,
+    @Param('id') id: string,
+    @Body() updateUrlDto: UpdateUrlDto,
+    @Query('userId') userId?: string,
   ): Promise<Url> {
     return this.shortenerService.updateSlug(id, updateUrlDto, userId);
   }
 
-  @Delete('api/urls/:id')
+  @Delete('urls/:id')
   async remove(
-      @Param('id') id: string,
-      @Query('userId') userId?: string,
+    @Param('id') id: string,
+    @Query('userId') userId?: string,
   ): Promise<void> {
     return this.shortenerService.remove(id, userId);
   }
 
   @Get('urls/:id/visits')
-  async getVisits(@Param('id') id: string): Promise<Visit[]> {
-    return this.shortenerService.getVisits(id);
+  async getVisits(@Param('id') id: string): Promise<{ visitedAt: Date }[]> {
+    const visits = await this.shortenerService.getVisits(id);
+    this.logger.log('Visits visits', visits);
+    return visits.map((v) => ({ visitedAt: v.visitedAt }));
   }
 }

@@ -1,37 +1,39 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Spinner } from '@heroui/react';
-import { useParams, useRouter } from 'next/navigation';
-import { urlService } from '@/lib/api';
-import variables from "@/config/variables";
+import React, { useEffect, useState } from "react";
+import { Spinner } from "@heroui/react";
+import { useParams, useRouter } from "next/navigation";
+import { urlService } from "@/lib/api";
 
 export default function SlugRedirectPage() {
-    const params = useParams<{ slug: string; }>();
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
+  const params = useParams<{ slug: string }>();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const validateAndRedirect = async () => {
-            if (!params.slug) return;
+  useEffect(() => {
+    const validateAndRedirect = async () => {
+      if (!params.slug) return;
 
-            try {
-                await urlService.getUrlBySlug(params.slug);
-                window.location.href = `${variables.apiUrl}/${params.slug}`;
-            } catch (err) {
-                console.error('Error validating URL:', err);
-                router.push('/404');
-            }
-        };
+      try {
+        const url = await urlService.getUrlBySlug(params.slug);
+        if (url) {
+          window.location.href = url.originalUrl;
+        } else {
+          throw new Error("No URL returned from API");
+        }
+      } catch (err) {
+        console.error("Error validating URL:", err);
+        router.push("/404");
+      }
+    };
 
-        validateAndRedirect();
-    }, [params.slug, router]);
+    validateAndRedirect();
+  }, [params.slug, router]);
 
-    // Show a simple loading spinner while validating and redirecting
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center">
-            <Spinner size="lg" color="primary" />
-            <p className="mt-4 text-gray-600">Redirecting...</p>
-        </div>
-    );
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <Spinner size="lg" color="primary" />
+      <p className="mt-4 text-gray-600">Redirecting...</p>
+    </div>
+  );
 }

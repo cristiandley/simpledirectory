@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +12,8 @@ import { Visit } from './entities/visit.entity/visit.entity';
 
 @Injectable()
 export class ShortenerService {
+  private readonly logger = new Logger(ShortenerService.name);
+
   constructor(
     @InjectRepository(Url)
     private urlRepository: Repository<Url>,
@@ -64,11 +67,12 @@ export class ShortenerService {
       where: { slug },
     });
     if (!url) {
+      this.logger.error('No url found');
       throw new NotFoundException('URL not found');
     }
     url.visits += 1;
     await this.urlRepository.save(url);
-    const visit = this.visitRepository.create({ url });
+    const visit = this.visitRepository.create({ url: { id: url.id } });
     await this.visitRepository.save(visit);
     return url;
   }
@@ -103,7 +107,7 @@ export class ShortenerService {
   async getVisits(id: string): Promise<Visit[]> {
     const url = await this.urlRepository.findOneOrFail({ where: { id } });
     return this.visitRepository.find({
-      where: { url },
+      where: { url: { id: url.id } },
       order: { visitedAt: 'ASC' },
     });
   }

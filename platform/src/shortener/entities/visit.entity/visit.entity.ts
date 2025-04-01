@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Url } from '../url.entity/url.entity';
 
@@ -12,8 +11,7 @@ export class Visit {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Url, (url) => url.visitsLog, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'urlId' })
+  @ManyToOne(() => Url, (url) => url.visitsLog)
   url: Url;
 
   @CreateDateColumn()

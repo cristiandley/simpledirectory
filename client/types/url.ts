@@ -1,19 +1,25 @@
 export interface Url {
-    id: string;
-    originalUrl: string;
-    slug: string;
-    visits: number;
-    createdAt: string;
-    userId?: string;
-    updatedAt?: string;
+  id: string;
+  originalUrl: string;
+  slug: string;
+  visits: number;
+  createdAt: string;
+  userId?: string;
+  updatedAt?: string;
+  visitsLog?: Visit[];
 }
 
 export interface CreateUrlDto {
-    originalUrl: string;
-    customSlug?: string;
-    userId?: string;  // Added to match backend
+  originalUrl: string;
+  customSlug?: string;
+  userId?: string;
 }
 
 export interface UpdateUrlDto {
-    slug: string;
+  slug: string;
+}
+
+export interface Visit {
+  id: string;
+  visitedAt: string;
 }
