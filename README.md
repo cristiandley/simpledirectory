@@ -108,6 +108,11 @@ sequenceDiagram
     Frontend-->>User: Display URLs list with stats
 ```
 
+## Coverage
+
+<img width="801" alt="Screenshot 2025-04-01 at 06 31 19" src="https://github.com/user-attachments/assets/a096abbe-121b-44df-be35-3e03fbdd237c" />
+
+
 ## Project Improvements
 
 - [ ] Adding real sessions
