@@ -21,9 +21,10 @@ export class ShortenerController {
 
   @Post('urls')
   async create(
-    @Body() createUrlDto: CreateUrlDto,
+      @Body() createUrlDto: CreateUrlDto,
   ): Promise<{ url: Url; shortenedUrl: string }> {
-    const url = await this.shortenerService.create(createUrlDto);
+    const { userId, ...urlData } = createUrlDto;
+    const url = await this.shortenerService.create(urlData, userId);
     const shortenedUrl = `http://localhost:3000/${url.slug}`;
     return {
       url,
@@ -49,6 +50,7 @@ export class ShortenerController {
       throw error;
     }
   }
+
   @Get('urls/:slug')
   async findBySlug(@Param('slug') slug: string): Promise<Url> {
     return this.shortenerService.findBySlug(slug);
@@ -56,17 +58,17 @@ export class ShortenerController {
 
   @Put('urls/:id')
   async update(
-    @Param('id') id: string,
-    @Body() updateUrlDto: UpdateUrlDto,
-    @Query('userId') userId?: string,
+      @Param('id') id: string,
+      @Body() updateUrlDto: UpdateUrlDto,
+      @Query('userId') userId?: string,
   ): Promise<Url> {
     return this.shortenerService.updateSlug(id, updateUrlDto, userId);
   }
 
   @Delete('api/urls/:id')
   async remove(
-    @Param('id') id: string,
-    @Query('userId') userId?: string,
+      @Param('id') id: string,
+      @Query('userId') userId?: string,
   ): Promise<void> {
     return this.shortenerService.remove(id, userId);
   }

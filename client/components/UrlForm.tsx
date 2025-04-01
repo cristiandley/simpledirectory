@@ -122,7 +122,7 @@ export default function UrlForm({ onSuccess }: UrlFormProps) {
             <div className="flex flex-col gap-4">
                 <Input
                     label="Your URL"
-                    placeholder="https://example.com/long/path/to/resource"
+                    placeholder="https://kitty.com/meow/meow/prrr/prrr"
                     value={url}
                     onValueChange={setUrl}
                     variant="bordered"

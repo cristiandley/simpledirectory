@@ -1,4 +1,4 @@
-import { IsUrl, IsString, IsOptional } from 'class-validator';
+import { IsUrl, IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateUrlDto {
   @IsUrl({}, { message: 'Please provide a valid URL' })
@@ -7,6 +7,11 @@ export class CreateUrlDto {
   @IsString()
   @IsOptional()
   customSlug?: string;
+
+  @IsString()
+  @IsOptional()
+  @IsEmail({}, { message: 'Please provide a valid email' })
+  userId?: string;
 }
 
 export class UpdateUrlDto {
