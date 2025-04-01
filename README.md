@@ -1,5 +1,8 @@
 ## SimpleDirectory (KittyShortener)
 
+<p align="center">
+<img width="400" alt="Screenshot 2025-04-01 at 11 55 11" src="https://github.com/user-attachments/assets/9c1d2782-4897-4207-b604-d7334360cfa3" />
+</p>
 
 ## Running the project
 
