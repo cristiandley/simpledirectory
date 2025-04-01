@@ -7,12 +7,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Url } from './entities/url.entity/url.entity';
 import { CreateUrlDto, UpdateUrlDto } from './dto/url.dto/url.dto';
+import { Visit } from './entities/visit.entity/visit.entity';
 
 @Injectable()
 export class ShortenerService {
   constructor(
     @InjectRepository(Url)
     private urlRepository: Repository<Url>,
+    @InjectRepository(Visit)
+    private readonly visitRepository: Repository<Visit>,
   ) {}
 
   private generateSlug(length: number = 6): string {
@@ -57,9 +60,17 @@ export class ShortenerService {
   }
 
   async trackVisit(slug: string): Promise<Url> {
-    const url = await this.findBySlug(slug);
+    const url = await this.urlRepository.findOne({
+      where: { slug },
+    });
+    if (!url) {
+      throw new NotFoundException('URL not found');
+    }
     url.visits += 1;
-    return this.urlRepository.save(url);
+    await this.urlRepository.save(url);
+    const visit = this.visitRepository.create({ url });
+    await this.visitRepository.save(visit);
+    return url;
   }
 
   async updateSlug(
@@ -87,5 +98,13 @@ export class ShortenerService {
       throw new NotFoundException(`URL with ID ${id} not found for this user`);
     }
     await this.urlRepository.remove(url);
+  }
+
+  async getVisits(id: string): Promise<Visit[]> {
+    const url = await this.urlRepository.findOneOrFail({ where: { id } });
+    return this.visitRepository.find({
+      where: { url },
+      order: { visitedAt: 'ASC' },
+    });
   }
 }

@@ -14,6 +14,7 @@ import {
 import { ShortenerService } from './shortener.service';
 import { CreateUrlDto, UpdateUrlDto } from './dto/url.dto/url.dto';
 import { Url } from './entities/url.entity/url.entity';
+import { Visit } from "./entities/visit.entity/visit.entity";
 
 @Controller()
 export class ShortenerController {
@@ -71,5 +72,10 @@ export class ShortenerController {
       @Query('userId') userId?: string,
   ): Promise<void> {
     return this.shortenerService.remove(id, userId);
+  }
+
+  @Get('urls/:id/visits')
+  async getVisits(@Param('id') id: string): Promise<Visit[]> {
+    return this.shortenerService.getVisits(id);
   }
 }

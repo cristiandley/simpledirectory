@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, NotFoundException, ConflictException } from '@nestjs/common';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import { ShortenerController } from './shortener.controller';
 import { ShortenerService } from './shortener.service';
 import { CreateUrlDto, UpdateUrlDto } from './dto/url.dto/url.dto';
@@ -16,6 +16,7 @@ describe('ShortenerController', () => {
     trackVisit: jest.fn(),
     updateSlug: jest.fn(),
     remove: jest.fn(),
+    getVisits: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -45,7 +46,7 @@ describe('ShortenerController', () => {
     it('should create a shortened URL', async () => {
       const createUrlDto: CreateUrlDto = {
         originalUrl: 'https://example.com',
-        userId: 'user@example.com'
+        userId: 'user@example.com',
       };
 
       const createdUrl: Url = {
@@ -63,8 +64,8 @@ describe('ShortenerController', () => {
       const result = await controller.create(createUrlDto);
 
       expect(service.create).toHaveBeenCalledWith(
-          { originalUrl: 'https://example.com' },
-          'user@example.com'
+        { originalUrl: 'https://example.com' },
+        'user@example.com',
       );
       expect(result).toEqual({
         url: createdUrl,
@@ -74,7 +75,7 @@ describe('ShortenerController', () => {
 
     it('should create a shortened URL without userId', async () => {
       const createUrlDto: CreateUrlDto = {
-        originalUrl: 'https://example.com'
+        originalUrl: 'https://example.com',
       };
 
       const createdUrl: Url = {
@@ -82,7 +83,7 @@ describe('ShortenerController', () => {
         originalUrl: 'https://example.com',
         slug: 'abc123',
         visits: 0,
-        userId: "",
+        userId: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -92,8 +93,8 @@ describe('ShortenerController', () => {
       const result = await controller.create(createUrlDto);
 
       expect(service.create).toHaveBeenCalledWith(
-          { originalUrl: 'https://example.com' },
-          undefined
+        { originalUrl: 'https://example.com' },
+        undefined,
       );
       expect(result).toEqual({
         url: createdUrl,
@@ -110,7 +111,7 @@ describe('ShortenerController', () => {
           originalUrl: 'https://example.com',
           slug: 'abc123',
           visits: 0,
-          userId: "",
+          userId: '',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -119,7 +120,7 @@ describe('ShortenerController', () => {
           originalUrl: 'https://test.com',
           slug: 'def456',
           visits: 5,
-          userId: "",
+          userId: '',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -164,7 +165,7 @@ describe('ShortenerController', () => {
         originalUrl: 'https://example.com',
         slug,
         visits: 1,
-        userId: "",
+        userId: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -183,7 +184,9 @@ describe('ShortenerController', () => {
     it('should redirect to 404 page when slug is not found', async () => {
       const slug = 'nonexistent';
 
-      mockShortenerService.trackVisit.mockRejectedValue(new NotFoundException());
+      mockShortenerService.trackVisit.mockRejectedValue(
+        new NotFoundException(),
+      );
 
       const result = await controller.redirect(slug);
 
@@ -203,7 +206,7 @@ describe('ShortenerController', () => {
         originalUrl: 'https://example.com',
         slug,
         visits: 0,
-        userId: "",
+        userId: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -219,9 +222,13 @@ describe('ShortenerController', () => {
     it('should throw NotFoundException for invalid slug', async () => {
       const slug = 'nonexistent';
 
-      mockShortenerService.findBySlug.mockRejectedValue(new NotFoundException());
+      mockShortenerService.findBySlug.mockRejectedValue(
+        new NotFoundException(),
+      );
 
-      await expect(controller.findBySlug(slug)).rejects.toThrow(NotFoundException);
+      await expect(controller.findBySlug(slug)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -234,7 +241,7 @@ describe('ShortenerController', () => {
         originalUrl: 'https://example.com',
         slug: 'newslug',
         visits: 0,
-        userId: "",
+        userId: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -243,7 +250,11 @@ describe('ShortenerController', () => {
 
       const result = await controller.update(id, updateUrlDto);
 
-      expect(service.updateSlug).toHaveBeenCalledWith(id, updateUrlDto, undefined);
+      expect(service.updateSlug).toHaveBeenCalledWith(
+        id,
+        updateUrlDto,
+        undefined,
+      );
       expect(result).toEqual(updatedUrl);
     });
 
@@ -290,6 +301,23 @@ describe('ShortenerController', () => {
       await controller.remove(id, userId);
 
       expect(service.remove).toHaveBeenCalledWith(id, userId);
+    });
+  });
+
+  describe('getVisits', () => {
+    it('should return list of visits for a given URL id', async () => {
+      const urlId = '1';
+      const visits = [
+        { id: 'v1', visitedAt: new Date(), url: { id: urlId } },
+        { id: 'v2', visitedAt: new Date(), url: { id: urlId } },
+      ];
+
+      mockShortenerService.getVisits.mockResolvedValue(visits);
+
+      const result = await controller.getVisits(urlId);
+
+      expect(service.getVisits).toHaveBeenCalledWith(urlId);
+      expect(result).toEqual(visits);
     });
   });
 });

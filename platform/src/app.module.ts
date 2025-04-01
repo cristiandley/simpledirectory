@@ -6,20 +6,23 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ShortenerModule } from './shortener/shortener.module';
 import { Url } from './shortener/entities/url.entity/url.entity';
+import { Visit } from './shortener/entities/visit.entity/visit.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'database.sqlite',
-      entities: [Url],
+      entities: [Url, Visit],
       synchronize: true, // should not be here for production
     }),
-    ThrottlerModule.forRoot([{
-      name: 'short',
-      limit: 20, // Might be low... but...
-      ttl: 60000 // (60 seconds)
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        limit: 20, // Might be low... but...
+        ttl: 60000, // (60 seconds)
+      },
+    ]),
     ShortenerModule,
   ],
   controllers: [AppController],

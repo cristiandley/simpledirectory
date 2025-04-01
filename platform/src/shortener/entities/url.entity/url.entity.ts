@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Visit } from '../visit.entity/visit.entity';
 
 @Entity()
 export class Url {
@@ -28,4 +30,7 @@ export class Url {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Visit, (visit) => visit.url)
+  visitsLog?: Visit[];
 }

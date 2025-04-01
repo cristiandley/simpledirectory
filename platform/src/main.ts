@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-      logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   app.setGlobalPrefix('api');
   app.enableVersioning({
@@ -12,8 +12,8 @@ async function bootstrap() {
     defaultVersion: '1',
   });
   app.enableCors({
-     origin: ['http://client:3000', 'http://localhost:3000'],
-     credentials: true,
+    origin: ['http://client:3000', 'http://localhost:3000'],
+    credentials: true,
   });
   app.useGlobalPipes(
     new ValidationPipe({
