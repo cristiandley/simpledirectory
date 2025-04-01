@@ -95,7 +95,7 @@ export default function UrlsPage() {
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
-                <h1 className="font-extrabold text-4xl">Your URLs</h1>
+                <h1 className="font-extrabold text-4xl">URLs Stats</h1>
                 <Link href="/">
                     <Button
                         color="default"
