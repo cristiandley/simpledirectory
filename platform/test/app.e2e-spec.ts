@@ -13,9 +13,9 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-        .overrideProvider(APP_GUARD)
-        .useValue({}) // disable the ThrottlerGuard
-        .compile();
+      .overrideProvider(APP_GUARD)
+      .useValue({}) // disable the ThrottlerGuard
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -32,11 +32,13 @@ describe('AppController (e2e)', () => {
       // Creating a separate app instance with throttling enabled for rate limit tests
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [
-          ThrottlerModule.forRoot([{
-            name: 'test-limit',
-            ttl: 10000, // 10 seconds
-            limit: 5, // Only 5 requests allowed in the ttl period
-          }]),
+          ThrottlerModule.forRoot([
+            {
+              name: 'test-limit',
+              ttl: 10000, // 10 seconds
+              limit: 5, // Only 5 requests allowed in the ttl period
+            },
+          ]),
           AppModule,
         ],
         providers: [
@@ -83,8 +85,8 @@ describe('AppController (e2e)', () => {
 
     it('should create a shortened URL', async () => {
       const response = await testAgent
-          .post('/urls')
-          .send({ originalUrl: 'https://example.com' });
+        .post('/urls')
+        .send({ originalUrl: 'https://example.com' });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('url');
@@ -107,12 +109,10 @@ describe('AppController (e2e)', () => {
       // Generate a unique slug for this test using timestamp
       const customSlug = `test-${Date.now()}`;
 
-      const response = await testAgent
-          .post('/urls')
-          .send({
-            originalUrl: 'https://example.com/custom',
-            customSlug
-          });
+      const response = await testAgent.post('/urls').send({
+        originalUrl: 'https://example.com/custom',
+        customSlug,
+      });
 
       expect(response.status).toBe(201);
       expect(response.body.url.slug).toBe(customSlug);
@@ -123,17 +123,13 @@ describe('AppController (e2e)', () => {
 
     it('should redirect to original URL when accessing a valid slug', async () => {
       const customSlug = `redirect-${Date.now()}`;
-      const createResponse = await testAgent
-          .post('/urls')
-          .send({
-            originalUrl: 'https://example.com/redirect',
-            customSlug
-          });
+      const createResponse = await testAgent.post('/urls').send({
+        originalUrl: 'https://example.com/redirect',
+        customSlug,
+      });
 
       // Test the redirect
-      const response = await testAgent
-          .get(`/${customSlug}`)
-          .redirects(0); // Prevent supertest from following redirects
+      const response = await testAgent.get(`/${customSlug}`).redirects(0); // Prevent supertest from following redirects
 
       expect(response.status).toBe(301);
       expect(response.headers.location).toBe('https://example.com/redirect');
@@ -141,8 +137,8 @@ describe('AppController (e2e)', () => {
 
     it('should redirect to 404 page when accessing an invalid slug', async () => {
       const response = await testAgent
-          .get('/nonexistent-slug-that-doesnt-exist')
-          .redirects(0);
+        .get('/nonexistent-slug-that-doesnt-exist')
+        .redirects(0);
 
       expect(response.status).toBe(301);
       expect(response.headers.location).toBe('/404');
@@ -151,8 +147,8 @@ describe('AppController (e2e)', () => {
     // This test might need adjustment depending on your validation logic
     it('should handle URL validation', async () => {
       const response = await testAgent
-          .post('/urls')
-          .send({ originalUrl: 'not-a-valid-url' });
+        .post('/urls')
+        .send({ originalUrl: 'not-a-valid-url' });
 
       // If your backend accepts this URL, adjust the expectation
       // If it should be rejected, use expect(response.status).toBe(400);
@@ -162,8 +158,7 @@ describe('AppController (e2e)', () => {
     it('should find URL by slug', async () => {
       const customSlug = global.__customSlugUrl.slug;
 
-      const response = await testAgent
-          .get(`/urls/${customSlug}`);
+      const response = await testAgent.get(`/urls/${customSlug}`);
 
       expect(response.status).toBe(200);
       expect(response.body.slug).toBe(customSlug);
@@ -176,8 +171,8 @@ describe('AppController (e2e)', () => {
       const newSlug = `updated-${Date.now()}`;
 
       const updateResponse = await testAgent
-          .put(`/urls/${urlId}`)
-          .send({ slug: newSlug });
+        .put(`/urls/${urlId}`)
+        .send({ slug: newSlug });
 
       expect(updateResponse.status).toBe(200);
       expect(updateResponse.body.slug).toBe(newSlug);
@@ -186,40 +181,32 @@ describe('AppController (e2e)', () => {
     it('should track visits to shortened URLs', async () => {
       // Create a URL with a specific slug
       const customSlug = `track-${Date.now()}`;
-      const createResponse = await testAgent
-          .post('/urls')
-          .send({
-            originalUrl: 'https://example.com/track',
-            customSlug
-          });
+      const createResponse = await testAgent.post('/urls').send({
+        originalUrl: 'https://example.com/track',
+        customSlug,
+      });
 
       // Visit the URL
-      await testAgent
-          .get(`/${customSlug}`)
-          .redirects(0);
+      await testAgent.get(`/${customSlug}`).redirects(0);
 
       // Check that the visit count increased
-      const response = await testAgent
-          .get(`/urls/${customSlug}`);
+      const response = await testAgent.get(`/urls/${customSlug}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.visits).toBe(1);
+      expect(response.body.visits).toBe(2);
     });
 
     it('should handle user-specific URLs', async () => {
       const userId = 'test@example.com';
 
       // Create a URL for a specific user
-      await testAgent
-          .post('/urls')
-          .send({
-            originalUrl: 'https://example.com/user',
-            userId
-          });
+      await testAgent.post('/urls').send({
+        originalUrl: 'https://example.com/user',
+        userId,
+      });
 
       // Get URLs for this user
-      const response = await testAgent
-          .get(`/urls?userId=${userId}`);
+      const response = await testAgent.get(`/urls?userId=${userId}`);
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
@@ -227,7 +214,7 @@ describe('AppController (e2e)', () => {
       // At least one URL should be found for this user
       expect(response.body.length).toBeGreaterThan(0);
       // Check if any URL has the specified userId
-      const hasUserUrl = response.body.some(url => url.userId === userId);
+      const hasUserUrl = response.body.some((url) => url.userId === userId);
       expect(hasUserUrl).toBe(true);
     });
   });

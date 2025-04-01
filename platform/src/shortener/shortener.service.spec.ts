@@ -254,7 +254,9 @@ describe('ShortenerService', () => {
         ...url,
         visits: 2,
       });
-      expect(mockVisitRepository.create).toHaveBeenCalledWith({ url });
+      expect(mockVisitRepository.create).toHaveBeenCalledWith({
+        url: { id: url.id },
+      });
       expect(mockVisitRepository.save).toHaveBeenCalled();
       expect(result).toEqual(updatedUrl);
     });

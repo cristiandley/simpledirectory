@@ -212,10 +212,12 @@ describe('ShortenerController', () => {
       };
 
       mockShortenerService.findBySlug.mockResolvedValue(url);
+      mockShortenerService.trackVisit.mockResolvedValue(url);
 
       const result = await controller.findBySlug(slug);
 
       expect(service.findBySlug).toHaveBeenCalledWith(slug);
+      expect(service.trackVisit).toHaveBeenCalledWith(slug);
       expect(result).toEqual(url);
     });
 
@@ -317,7 +319,7 @@ describe('ShortenerController', () => {
       const result = await controller.getVisits(urlId);
 
       expect(service.getVisits).toHaveBeenCalledWith(urlId);
-      expect(result).toEqual(visits);
+      expect(result).toEqual(visits.map((v) => ({ visitedAt: v.visitedAt })));
     });
   });
 });
