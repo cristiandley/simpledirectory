@@ -31,6 +31,8 @@ export class Url {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Visit, (visit) => visit.url)
+  @OneToMany(() => Visit, (visit) => visit.url, {
+    cascade: true,
+  })
   visitsLog?: Visit[];
 }

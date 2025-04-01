@@ -11,7 +11,9 @@ export class Visit {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Url, (url) => url.visitsLog)
+  @ManyToOne(() => Url, (url) => url.visitsLog, {
+    onDelete: 'CASCADE',
+  })
   url: Url;
 
   @CreateDateColumn()
