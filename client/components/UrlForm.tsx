@@ -64,23 +64,16 @@ export default function UrlForm({ onSuccess }: UrlFormProps) {
                 originalUrl: url,
                 ...(customSlug && { customSlug }),
             };
-
-            // Create URL (with email as userId if provided)
             const result = await urlService.createUrl(data, email || undefined);
-
-            // Show success message
+            const shortenedURL = `http://localhost:3000/s/${result.url.slug}`;
             addToast({
                 title: 'URL shortened successfully!',
                 description: 'Your shortened URL is ready to use',
                 color: 'success',
                 icon: <Icon icon="lucide:check" />
             });
-
-            // Set the shortened URL for display
-            setShortenedUrl(result.shortenedUrl);
+            setShortenedUrl(shortenedURL);
             setShowResult(true);
-
-            // Reset form inputs except email
             setUrl('');
             setCustomSlug('');
             onSuccess();

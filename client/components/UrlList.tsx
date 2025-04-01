@@ -14,8 +14,8 @@ interface UrlListProps {
 export default function UrlList({ urls, onDelete, isLoading = false }: UrlListProps) {
     const copyToClipboard = async (slug: string) => {
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-            const fullUrl = `${baseUrl}/${slug}`;
+            const baseUrl = window.location.origin;
+            const fullUrl = `${baseUrl}/s/${slug}`;
 
             await navigator.clipboard.writeText(fullUrl);
 
@@ -37,8 +37,8 @@ export default function UrlList({ urls, onDelete, isLoading = false }: UrlListPr
     };
 
     const openUrl = (slug: string) => {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-        window.open(`${baseUrl}/${slug}`, '_blank');
+        const baseUrl = window.location.origin;
+        window.open(`${baseUrl}/s/${slug}`, '_blank');
     };
 
     if (isLoading) {

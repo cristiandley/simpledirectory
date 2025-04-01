@@ -1,10 +1,9 @@
 import axios from 'axios';
 import type { Url, CreateUrlDto, UpdateUrlDto } from '@/types/url';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+import variables from '../config/variables';
 
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: variables.apiUrl,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -23,7 +22,7 @@ export const urlService = {
         return response.data;
     },
     getUrlBySlug: async (slug: string): Promise<Url> => {
-        const response = await api.get(`/urls/${slug}`);
+        const response = await api.get(`urls/${slug}`);
         return response.data;
     },
     updateUrl: async (id: string, data: UpdateUrlDto, userId?: string): Promise<Url> => {

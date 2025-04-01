@@ -25,7 +25,7 @@ export class ShortenerController {
   ): Promise<{ url: Url; shortenedUrl: string }> {
     const { userId, ...urlData } = createUrlDto;
     const url = await this.shortenerService.create(urlData, userId);
-    const shortenedUrl = `http://localhost:3000/${url.slug}`;
+    const shortenedUrl = `http://localhost:3000/s/${url.slug}`;
     return {
       url,
       shortenedUrl,

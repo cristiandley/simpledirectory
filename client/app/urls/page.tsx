@@ -46,17 +46,12 @@ export default function UrlsPage() {
 
     const handleDelete = async (id: string) => {
         try {
-            // Delete URL with the user ID filter if set
             await urlService.deleteUrl(id, userIdFilter || undefined);
-
-            // Update toast on success
             addToast({
                 title: 'URL deleted successfully',
                 color: 'success',
                 icon: <Icon icon="lucide:check" />
             });
-
-            // Refresh URL list
             await fetchUrls(userIdFilter || undefined);
         } catch (err) {
             console.error('Failed to delete URL:', err);
@@ -180,10 +175,6 @@ export default function UrlsPage() {
                         isLoading={isLoading}
                     />
                 </div>
-            </div>
-
-            <div className="text-center text-gray-500 text-sm py-4">
-                <a href="https://github.com/cristiandley" target="_blank" rel="noopener noreferrer">cristiandley</a>
             </div>
         </div>
     );

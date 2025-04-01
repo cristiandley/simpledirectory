@@ -27,6 +27,9 @@ export default function RootLayout({ children,
                         <div className="mx-auto p-8 max-w-[800px]">
                             {children}
                         </div>
+                        <div className="text-center text-gray-500 text-sm py-4">
+                            <a href="https://github.com/cristiandley" target="_blank" rel="noopener noreferrer">cristiandley</a>
+                        </div>
                     </div>
                 </Providers>
             </body>

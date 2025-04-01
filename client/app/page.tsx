@@ -12,7 +12,6 @@ export default function HomePage() {
     const [isLoading, setIsLoading] = React.useState(false);
 
     const fetchUrls = React.useCallback(async () => {
-        // This remains for onSuccess callback in UrlForm
         try {
             await urlService.getUrls();
         } catch (err) {
@@ -53,10 +52,6 @@ export default function HomePage() {
                         </div>
                     </div>
                     <UrlForm onSuccess={fetchUrls} />
-                </div>
-
-                <div className="text-center text-gray-500 text-sm py-4">
-                    <a href="https://github.com/cristiandley" target="_blank" rel="noopener noreferrer">cristiandley</a>
                 </div>
             </div>
         </div>
